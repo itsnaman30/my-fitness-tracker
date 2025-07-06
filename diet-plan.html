@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diet Plan - My Fitness & Diet Journey</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background fallback */
+            color: #333;
+            /* Fixed Background Image */
+            background-image: url('https://placehold.co/1920x1080/E0F2F7/2C3E50?text=Fitness+Background'); /* Example fixed image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Ensures background stays fixed during scroll */
+        }
+        /* Custom scrollbar for meal list */
+        #mealList::-webkit-scrollbar {
+            width: 8px;
+        }
+        #mealList::-webkit-scrollbar-track {
+            background: #e2e8f0; /* bg-gray-200 */
+            border-radius: 10px;
+        }
+        #mealList::-webkit-scrollbar-thumb {
+            background: #60a5fa; /* bg-blue-400 */
+            border-radius: 10px;
+        }
+        #mealList::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; /* bg-blue-500 */
+        }
+        /* Message display styling */
+        .message-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+        }
+        .message-display.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .message-display.success {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        .message-display.error {
+            background-color: #f44336; /* Red */
+            color: white;
+        }
+        .message-display.info {
+            background-color: #2196F3; /* Blue */
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
+
+    <!-- Custom Message Display -->
+    <div id="messageDisplay" class="message-display"></div>
+
+    <!-- Main Container -->
+    <div class="bg-white shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-4xl">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-blue-600 mb-2">My Fitness & Diet Journey</h1>
+            <p class="text-lg text-gray-600">Track your activities, plan your meals, and explore food data!</p>
+        </header>
+
+        <!-- Navigation Bar -->
+        <nav class="mb-8 flex flex-wrap justify-center gap-2 sm:gap-4 p-4 bg-blue-100 rounded-lg shadow-md">
+            <a href="index.html" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Fitness Tracker</a>
+            <a href="diet-plan.html" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Diet Plan</a>
+            <a href="food-database.html" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Food Database</a>
+        </nav>
+
+        <!-- Diet Plan Page Content -->
+        <div>
+            <section class="p-6 bg-blue-50 rounded-lg shadow-inner mb-8">
+                <h2 class="text-2xl font-semibold text-blue-700 mb-4 text-center">Your Personalized Diet Plan</h2>
+                <p class="text-center text-gray-700 mb-6">Add and manage your daily meal plan entries below.</p>
+
+                <!-- Add Meal Form -->
+                <div class="mb-8 p-6 bg-gray-100 rounded-lg shadow-inner">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Add New Meal</h3>
+                    <form id="mealForm" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="mealName" class="block text-sm font-medium text-gray-700 mb-1">Meal Name</label>
+                            <input type="text" id="mealName" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="e.g., Breakfast, Lunch, Snack" required>
+                        </div>
+                        <div>
+                            <label for="mealCalories" class="block text-sm font-medium text-gray-700 mb-1">Estimated Calories (kcal)</label>
+                            <input type="number" id="mealCalories" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400" min="1" required>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="mealDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea id="mealDescription" class="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 h-24" placeholder="e.g., Oatmeal with berries, grilled chicken salad" required></textarea>
+                        </div>
+                        <div class="sm:col-span-2 flex justify-center mt-2">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition duration-300 ease-in-out transform hover:scale-105">Add Meal</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Meal List Section -->
+                <div class="p-6 bg-white rounded-lg shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4 text-center">Your Meals</h3>
+                    <div id="mealList" class="max-h-96 overflow-y-auto border border-gray-200 rounded-md p-2">
+                        <!-- Meals will be dynamically added here -->
+                        <p id="noMealsMessage" class="text-center text-gray-500 py-4">No meals added yet. Start planning!</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script>
+        // Common showMessage function for all pages
+        const messageDisplay = document.getElementById('messageDisplay');
+
+        function showMessage(message, type, duration = 3000) {
+            messageDisplay.textContent = message;
+            messageDisplay.className = `message-display show ${type}`;
+
+            setTimeout(() => {
+                messageDisplay.classList.remove('show');
+            }, duration);
+        }
+
+        // Diet Plan specific data and DOM elements
+        let dietPlanData = [];
+
+        const mealForm = document.getElementById('mealForm');
+        const mealNameInput = document.getElementById('mealName');
+        const mealCaloriesInput = document.getElementById('mealCalories');
+        const mealDescriptionInput = document.getElementById('mealDescription');
+        const mealListContainer = document.getElementById('mealList');
+        const noMealsMessage = document.getElementById('noMealsMessage');
+
+        // Default sample diet plan data if localStorage is empty
+        const defaultDietPlan = [
+            { id: 1, name: "Breakfast", calories: 380, description: "1 cup Oatmeal with 1/2 cup berries and 1 tbsp almonds, 1 hard-boiled egg, 200ml skim milk." },
+            { id: 2, name: "Lunch", calories: 480, description: "Large mixed green salad with 4oz grilled chicken breast, 1/2 cup brown rice, light vinaigrette." },
+            { id: 3, name: "Snack", calories: 180, description: "1 medium apple with 1 tbsp peanut butter." },
+            { id: 4, name: "Dinner", calories: 550, description: "4oz baked salmon, 1 cup steamed broccoli and carrots, 1 medium sweet potato." }
+        ];
+
+        /**
+         * Initializes the diet plan page: loads data and renders UI.
+         */
+        function initializeDietPlan() {
+            loadDietPlan();
+            renderDietPlan();
+        }
+
+        /**
+         * Loads diet plan data from localStorage. If empty, loads default data.
+         */
+        function loadDietPlan() {
+            const storedDietPlan = localStorage.getItem('dietPlan');
+            if (storedDietPlan) {
+                dietPlanData = JSON.parse(storedDietPlan);
+            } else {
+                dietPlanData = [...defaultDietPlan]; // Use a copy of default data
+                saveDietPlan(); // Save default data to localStorage
+            }
+        }
+
+        /**
+         * Saves the current diet plan data to localStorage.
+         */
+        function saveDietPlan() {
+            localStorage.setItem('dietPlan', JSON.stringify(dietPlanData));
+        }
+
+        /**
+         * Renders the list of meal items in the UI.
+         */
+        function renderDietPlan() {
+            mealListContainer.innerHTML = ''; // Clear existing list
+
+            if (dietPlanData.length === 0) {
+                noMealsMessage.style.display = 'block';
+                return;
+            } else {
+                noMealsMessage.style.display = 'none';
+            }
+
+            dietPlanData.forEach(meal => {
+                const mealItem = document.createElement('div');
+                mealItem.classList.add('flex', 'flex-col', 'sm:flex-row', 'items-start', 'sm:items-center', 'justify-between', 'p-4', 'mb-2', 'bg-white', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
+                mealItem.innerHTML = `
+                    <div class="flex-grow mb-2 sm:mb-0">
+                        <p class="text-lg font-semibold text-gray-800">${meal.name} <span class="text-sm font-normal text-gray-600">(${meal.calories} kcal)</span></p>
+                        <p class="text-sm text-gray-600">${meal.description}</p>
+                    </div>
+                    <button data-id="${meal.id}" class="delete-meal-btn bg-red-500 hover:bg-red-600 text-white text-sm font-bold py-1 px-3 rounded-md transition duration-300 ease-in-out">Delete</button>
+                `;
+                mealListContainer.appendChild(mealItem);
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-meal-btn').forEach(button => {
+                button.addEventListener('click', deleteMeal);
+            });
+        }
+
+        /**
+         * Handles form submission to add a new meal.
+         * @param {Event} event - The form submission event.
+         */
+        function addMeal(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const name = mealNameInput.value.trim();
+            const calories = parseInt(mealCaloriesInput.value);
+            const description = mealDescriptionInput.value.trim();
+
+            if (!name || isNaN(calories) || calories <= 0 || !description) {
+                showMessage('Please fill in all fields with valid positive numbers for calories.', 'error');
+                return;
+            }
+
+            const newMeal = {
+                id: Date.now(), // Unique ID for the meal
+                name,
+                calories,
+                description
+            };
+
+            dietPlanData.push(newMeal);
+            saveDietPlan();
+            renderDietPlan();
+            showMessage('Meal added to plan!', 'success');
+
+            // Clear form fields
+            mealNameInput.value = '';
+            mealCaloriesInput.value = '';
+            mealDescriptionInput.value = '';
+        }
+
+        /**
+         * Deletes a meal from the list.
+         * @param {Event} event - The click event from the delete button.
+         */
+        function deleteMeal(event) {
+            const mealId = parseInt(event.target.dataset.id);
+            dietPlanData = dietPlanData.filter(meal => meal.id !== mealId);
+            saveDietPlan();
+            renderDietPlan();
+            showMessage('Meal deleted from plan.', 'info');
+        }
+
+        // Event Listener for meal form submission
+        mealForm.addEventListener('submit', addMeal);
+
+        // Initialize the diet plan page when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initializeDietPlan);
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Database - My Fitness & Diet Journey</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5; /* Light gray background fallback */
+            color: #333;
+            /* Fixed Background Image */
+            background-image: url('https://placehold.co/1920x1080/E0F2F7/2C3E50?text=Fitness+Background'); /* Example fixed image URL */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Ensures background stays fixed during scroll */
+        }
+        /* Custom scrollbar for food list */
+        #foodList::-webkit-scrollbar {
+            width: 8px;
+        }
+        #foodList::-webkit-scrollbar-track {
+            background: #e2e8f0; /* bg-gray-200 */
+            border-radius: 10px;
+        }
+        #foodList::-webkit-scrollbar-thumb {
+            background: #60a5fa; /* bg-blue-400 */
+            border-radius: 10px;
+        }
+        #foodList::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6; /* bg-blue-500 */
+        }
+        /* Message display styling */
+        .message-display {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            pointer-events: none; /* Allows clicks to pass through when hidden */
+        }
+        .message-display.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+        .message-display.success {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+        .message-display.error {
+            background-color: #f44336; /* Red */
+            color: white;
+        }
+        .message-display.info {
+            background-color: #2196F3; /* Blue */
+            color: white;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-8 px-4 sm:px-6 lg:px-8">
+
+    <!-- Custom Message Display -->
+    <div id="messageDisplay" class="message-display"></div>
+
+    <!-- Main Container -->
+    <div class="bg-white shadow-lg rounded-xl p-6 sm:p-8 w-full max-w-4xl">
+
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl sm:text-5xl font-bold text-blue-600 mb-2">My Fitness & Diet Journey</h1>
+            <p class="text-lg text-gray-600">Track your activities, plan your meals, and explore food data!</p>
+        </header>
+
+        <!-- Navigation Bar -->
+        <nav class="mb-8 flex flex-wrap justify-center gap-2 sm:gap-4 p-4 bg-blue-100 rounded-lg shadow-md">
+            <a href="index.html" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Fitness Tracker</a>
+            <a href="diet-plan.html" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Diet Plan</a>
+            <a href="food-database.html" class="nav-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Food Database</a>
+        </nav>
+
+        <!-- Food Database Page Content -->
+        <div>
+            <section class="p-6 bg-green-50 rounded-lg shadow-inner mb-8">
+                <h2 class="text-2xl font-semibold text-green-700 mb-4 text-center">Food Calorie Database</h2>
+                <p class="text-center text-gray-700 mb-6">Search for common food items and their approximate calorie and macronutrient counts per 100g.</p>
+
+                <div class="mb-4 flex flex-col sm:flex-row gap-2">
+                    <input type="text" id="foodSearchInput" placeholder="Search food item..." class="flex-grow p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-400">
+                    <button id="clearFoodSearchBtn" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out">Clear Search</button>
+                </div>
+
+                <div id="foodList" class="max-h-96 overflow-y-auto border border-gray-200 rounded-md p-2">
+                    <!-- Food items will be dynamically added here -->
+                    <p id="noFoodFoundMessage" class="text-center text-gray-500 py-4 hidden">No food items found matching your search.</p>
+                </div>
+            </section>
+        </div>
+
+    </div>
+
+    <script>
+        // Food Database Data (Static for now)
+        const foodData = [
+            { name: "Apple", caloriesPer100g: 52, protein: 0.3, carbs: 14, fat: 0.2 },
+            { name: "Banana", caloriesPer100g: 89, protein: 1.1, carbs: 23, fat: 0.3 },
+            { name: "Chicken Breast (cooked)", caloriesPer100g: 165, protein: 31, carbs: 0, fat: 3.6 },
+            { name: "Brown Rice (cooked)", caloriesPer100g: 123, protein: 2.7, carbs: 25.6, fat: 0.9 },
+            { name: "Broccoli (steamed)", caloriesPer100g: 35, protein: 2.4, carbs: 7.2, fat: 0.4 },
+            { name: "Salmon (baked)", caloriesPer100g: 208, protein: 20.4, carbs: 0, fat: 13.4 },
+            { name: "Egg (large, boiled)", caloriesPer100g: 155, protein: 13, carbs: 1.1, fat: 11 },
+            { name: "Oatmeal (cooked)", caloriesPer100g: 68, protein: 2.4, carbs: 12, fat: 1.4 },
+            { name: "Greek Yogurt (plain, non-fat)", caloriesPer100g: 59, protein: 10, carbs: 3.6, fat: 0.4 },
+            { name: "Almonds", caloriesPer100g: 579, protein: 21, carbs: 21, fat: 49 },
+            { name: "Walnuts", caloriesPer100g: 654, protein: 15, carbs: 14, fat: 65 },
+            { name: "Sweet Potato (baked)", caloriesPer100g: 86, protein: 1.6, carbs: 20, fat: 0.1 },
+            { name: "Spinach (raw)", caloriesPer100g: 23, protein: 2.9, carbs: 3.6, fat: 0.4 },
+            { name: "Lentils (cooked)", caloriesPer100g: 116, protein: 9, carbs: 20, fat: 0.4 },
+            { name: "Bread (whole wheat)", caloriesPer100g: 265, protein: 13, carbs: 49, fat: 3.6 },
+            { name: "Milk (skim)", caloriesPer100g: 34, protein: 3.4, carbs: 5, fat: 0.1 },
+            { name: "Avocado", caloriesPer100g: 160, protein: 2, carbs: 9, fat: 15 },
+            { name: "Olive Oil", caloriesPer100g: 884, protein: 0, carbs: 0, fat: 100 },
+            { name: "Cheddar Cheese", caloriesPer100g: 403, protein: 25, carbs: 1.3, fat: 33 },
+            { name: "Rice (white, cooked)", caloriesPer100g: 130, protein: 2.7, carbs: 28, fat: 0.3 },
+            { name: "Quinoa (cooked)", caloriesPer100g: 120, protein: 4.4, carbs: 21.3, fat: 1.9 },
+            { name: "Tuna (canned in water)", caloriesPer100g: 116, protein: 25.5, carbs: 0, fat: 1.1 },
+            { name: "Orange", caloriesPer100g: 47, protein: 0.9, carbs: 11.8, fat: 0.1 },
+            { name: "Blueberries", caloriesPer100g: 57, protein: 0.7, carbs: 14.5, fat: 0.3 },
+            { name: "Potatoes (boiled)", caloriesPer100g: 87, protein: 1.9, carbs: 20.1, fat: 0.1 },
+            { name: "Peanut Butter", caloriesPer100g: 588, protein: 25, carbs: 20, fat: 50 },
+            { name: "Coffee (black)", caloriesPer100g: 1, protein: 0.1, carbs: 0, fat: 0 },
+            { name: "Tea (unsweetened)", caloriesPer100g: 1, protein: 0, carbs: 0.3, fat: 0 }
+        ];
+
+        // DOM Elements
+        const messageDisplay = document.getElementById('messageDisplay');
+        const foodSearchInput = document.getElementById('foodSearchInput');
+        const foodListContainer = document.getElementById('foodList');
+        const noFoodFoundMessage = document.getElementById('noFoodFoundMessage');
+        const clearFoodSearchBtn = document.getElementById('clearFoodSearchBtn');
+
+        /**
+         * Initializes the application: renders food list.
+         */
+        function initializeApp() {
+            renderFoodList(); // Render food list on initialization
+        }
+
+        /**
+         * Displays a temporary message to the user.
+         * @param {string} message - The message text.
+         * @param {string} type - 'success', 'error', or 'info'.
+         * @param {number} duration - How long the message should be visible in milliseconds. Default 3000ms.
+         */
+        function showMessage(message, type, duration = 3000) {
+            messageDisplay.textContent = message;
+            messageDisplay.className = `message-display show ${type}`;
+
+            setTimeout(() => {
+                messageDisplay.classList.remove('show');
+            }, duration);
+        }
+
+        /**
+         * Renders the food list based on the search filter.
+         * @param {string} filterText - The text to filter food items by.
+         */
+        function renderFoodList(filterText = '') {
+            foodListContainer.innerHTML = ''; // Clear existing list
+            const lowerCaseFilter = filterText.toLowerCase().trim();
+            const filteredFood = foodData.filter(food =>
+                food.name.toLowerCase().includes(lowerCaseFilter)
+            );
+
+            if (filteredFood.length === 0) {
+                noFoodFoundMessage.style.display = 'block';
+                return;
+            } else {
+                noFoodFoundMessage.style.display = 'none';
+            }
+
+            // Create a table for better presentation
+            const table = document.createElement('table');
+            table.classList.add('min-w-full', 'bg-white', 'border-collapse', 'rounded-lg', 'overflow-hidden', 'shadow-sm');
+            table.innerHTML = `
+                <thead class="bg-gray-200">
+                    <tr>
+                        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700 border-b">Food Item</th>
+                        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700 border-b">Calories (per 100g)</th>
+                        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700 border-b hidden sm:table-cell">Protein (g)</th>
+                        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700 border-b hidden sm:table-cell">Carbs (g)</th>
+                        <th class="py-2 px-4 text-left text-sm font-semibold text-gray-700 border-b hidden sm:table-cell">Fat (g)</th>
+                    </tr>
+                </thead>
+                <tbody id="foodTableBody">
+                </tbody>
+            `;
+            foodListContainer.appendChild(table);
+            const foodTableBody = document.getElementById('foodTableBody');
+
+            filteredFood.forEach(food => {
+                const row = document.createElement('tr');
+                row.classList.add('hover:bg-gray-50', 'border-b', 'border-gray-100');
+                row.innerHTML = `
+                    <td class="py-2 px-4 text-sm text-gray-800">${food.name}</td>
+                    <td class="py-2 px-4 text-sm text-gray-800">${food.caloriesPer100g}</td>
+                    <td class="py-2 px-4 text-sm text-gray-800 hidden sm:table-cell">${food.protein}</td>
+                    <td class="py-2 px-4 text-sm text-gray-800 hidden sm:table-cell">${food.carbs}</td>
+                    <td class="py-2 px-4 text-sm text-gray-800 hidden sm:table-cell">${food.fat}</td>
+                `;
+                foodTableBody.appendChild(row);
+            });
+        }
+
+        // Food search input event listener
+        foodSearchInput.addEventListener('input', (event) => {
+            renderFoodList(event.target.value);
+        });
+
+        // Clear food search button event listener
+        clearFoodSearchBtn.addEventListener('click', () => {
+            foodSearchInput.value = '';
+            renderFoodList('');
+        });
+
+        // Initialize the app when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
